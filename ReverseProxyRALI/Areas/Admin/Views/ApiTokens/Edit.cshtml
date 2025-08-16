@@ -1,0 +1,179 @@
+@model FGate.Areas.Admin.Models.ApiTokenViewModel
+@{
+    ViewData["Title"] = "Editar API Token";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">@ViewData["Title"]</h5>
+                <p class="text-muted mb-0">Token: @Model.Description</p>
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="TokenId" />
+
+                    <!-- Basic Info -->
+                    <div class="mb-4">
+                        <div class="form-outline" data-mdb-input-init>
+                            <input asp-for="TokenValue" class="form-control" readonly />
+                            <label asp-for="TokenValue" class="form-label"></label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="form-outline" data-mdb-input-init>
+                                <input asp-for="Description" class="form-control" />
+                                <label asp-for="Description" class="form-label"></label>
+                            </div>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="form-outline" data-mdb-input-init>
+                                <input asp-for="OwnerName" class="form-control" />
+                                <label asp-for="OwnerName" class="form-label"></label>
+                            </div>
+                            <span asp-validation-for="OwnerName" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" asp-for="IsEnabled" />
+                                <label class="form-check-label" asp-for="IsEnabled"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" asp-for="DoesExpire" id="doesExpireCheck" />
+                                <label class="form-check-label" asp-for="DoesExpire"></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="expiresAtContainer" class="mb-4" style="display: none;">
+                        <div class="form-outline" data-mdb-input-init>
+                            <input asp-for="ExpiresAt" class="form-control" type="date" value="@(Model.ExpiresAt.HasValue? Model.ExpiresAt.Value.ToString("yyyy-MM-dd") : "")" />
+                            <label asp-for="ExpiresAt" class="form-label"></label>
+                        </div>
+                        <span asp-validation-for="ExpiresAt" class="text-danger"></span>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <!-- Permissions -->
+                    <h4>Permisos de Grupo</h4>
+                    <p class="text-muted">Asigna los grupos de endpoints a los que este token tendrá acceso.</p>
+
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th style="width: 5%;">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="selectAllPermissions" />
+                                            <label class="form-check-label" for="selectAllPermissions"></label>
+                                        </div>
+                                    </th>
+                                    <th>Nombre del Grupo</th>
+                                    <th>Métodos HTTP Permitidos (ej: GET,POST)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int i = 0; i < Model.Permissions.Count; i++)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input type="hidden" asp-for="Permissions[i].GroupId" />
+                                                <input type="hidden" asp-for="Permissions[i].GroupName" />
+                                                <input class="form-check-input permission-checkbox" type="checkbox" asp-for="Permissions[i].IsAssigned" />
+                                                <label class="form-check-label" asp-for="Permissions[i].IsAssigned"></label>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            @Model.Permissions[i].GroupName
+                                        </td>
+                                        <td>
+                                            <div class="form-outline" data-mdb-input-init>
+                                                <input asp-for="Permissions[i].AllowedHttpMethods" class="form-control form-control-sm http-methods-input" />
+                                                <label class="form-label" asp-for="Permissions[i].AllowedHttpMethods"></label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-4">
+                        <a asp-action="Index" class="btn btn-secondary me-2" data-mdb-ripple-init>Cancelar</a>
+                        <button type="submit" class="btn btn-primary" data-mdb-ripple-init><i class="fas fa-save me-2"></i>Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- Logic for showing/hiding the expiration date field ---
+            const doesExpireCheckbox = document.getElementById('doesExpireCheck');
+            const expiresAtContainer = document.getElementById('expiresAtContainer');
+
+            function toggleExpiresAt(isInit) {
+                if (doesExpireCheckbox.checked) {
+                    expiresAtContainer.style.display = 'block';
+                } else {
+                    expiresAtContainer.style.display = 'none';
+                    if (!isInit) {
+                        expiresAtContainer.querySelector('input').value = '';
+                    }
+                }
+            }
+
+            toggleExpiresAt(true); // Initial check
+            doesExpireCheckbox.addEventListener('change', () => toggleExpiresAt(false));
+
+
+            // --- Logic for permissions table ---
+            const selectAllCheckbox = document.getElementById('selectAllPermissions');
+            const permissionCheckboxes = document.querySelectorAll('.permission-checkbox');
+
+            function updateInputState(checkbox) {
+                const row = checkbox.closest('tr');
+                const textInput = row.querySelector('.http-methods-input');
+                const textInputInstance = mdb.Input.getInstance(textInput.parentElement);
+                if (checkbox.checked) {
+                    textInput.disabled = false;
+                    if (textInputInstance) textInputInstance.update();
+                } else {
+                    textInput.disabled = true;
+                    if (textInputInstance) textInputInstance.update();
+                }
+            }
+
+            selectAllCheckbox.addEventListener('change', function () {
+                permissionCheckboxes.forEach(chk => {
+                    chk.checked = selectAllCheckbox.checked;
+                    updateInputState(chk);
+                });
+            });
+
+            permissionCheckboxes.forEach(checkbox => {
+                updateInputState(checkbox); // Initial state
+                checkbox.addEventListener('change', function () {
+                    updateInputState(this);
+                });
+            });
+        });
+    </script>
+}

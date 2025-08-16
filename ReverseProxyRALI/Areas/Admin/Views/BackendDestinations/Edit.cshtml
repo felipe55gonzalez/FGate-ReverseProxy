@@ -1,0 +1,38 @@
+@model FGate.Data.Entities.BackendDestination
+@{
+    ViewData["Title"] = "Editar Destino Backend";
+}
+
+ 
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="DestinationId" />
+            <input type="hidden" asp-for="CreatedAt" />
+            <div class="mb-3">
+                <label asp-for="FriendlyName" class="form-label"></label>
+                <input asp-for="FriendlyName" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Address" class="form-label"></label>
+                <input asp-for="Address" class="form-control" placeholder="http://localhost:5000" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="HealthCheckPath" class="form-label"></label>
+                <input asp-for="HealthCheckPath" class="form-control" placeholder="/health" />
+            </div>
+            <div class="mb-3 form-check">
+                <input class="form-check-input" asp-for="IsEnabled" />
+                <label class="form-check-label" asp-for="IsEnabled"></label>
+            </div>
+            <div class="form-group mt-4">
+                <input type="submit" value="Guardar Cambios" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>

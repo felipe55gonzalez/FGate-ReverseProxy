@@ -1,0 +1,128 @@
+@model IEnumerable<FGate.Data.Entities.ApiToken>
+@{
+    ViewData["Title"] = "Gestión de API Tokens";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">@ViewData["Title"]</h5>
+            <a asp-action="Create" class="btn btn-primary" data-mdb-ripple-init><i class="fas fa-plus-circle me-2"></i>Crear Nuevo Token</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <form asp-action="Index" method="get" class="mb-4">
+            <div class="input-group">
+                <div class="form-outline" data-mdb-input-init>
+                    <input type="text" name="searchString" class="form-control" value="@ViewData["CurrentFilter"]" />
+                    <label class="form-label">Buscar por descripción o propietario...</label>
+                </div>
+                <button class="btn btn-primary" type="submit" data-mdb-ripple-init><i class="fas fa-search"></i></button>
+                <a asp-action="Index" class="btn btn-secondary" data-mdb-ripple-init><i class="fas fa-times"></i></a>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Descripción</th>
+                        <th>Propietario</th>
+                        <th>Habilitado</th>
+                        <th>Expira</th>
+                        <th>Creado</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                            <td>@Html.DisplayFor(modelItem => item.OwnerName)</td>
+                            <td>
+                                @if (item.IsEnabled)
+                                {
+                                    <span class="badge badge-success">Sí</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-secondary">No</span>
+                                }
+                            </td>
+                            <td>@(item.ExpiresAt.HasValue ? item.ExpiresAt.Value.ToLocalTime().ToString("d MMM yyyy") : "No expira")</td>
+                            <td>@item.CreatedAt.ToLocalTime().ToString("d MMM yyyy")</td>
+                            <td class="text-end">
+                                <a asp-action="Edit" asp-route-id="@item.TokenId" class="btn btn-secondary btn-sm" data-mdb-ripple-init><i class="fas fa-pencil-alt"></i></a>
+                                <button type="button" class="btn btn-danger btn-sm" data-mdb-toggle="modal" data-mdb-target="#confirmDeleteModal"
+                                        data-action-url="@Url.Action("Delete", "ApiTokens", new { id = item.TokenId })" data-mdb-ripple-init>
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+@if (TempData["NewTokenValue"] != null)
+{
+    <div class="modal fade" id="showNewTokenModal" tabindex="-1" aria-labelledby="showNewTokenModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="showNewTokenModalLabel">Token Creado Exitosamente</h5>
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Se ha creado el token para: <strong>@TempData["NewTokenDescription"]</strong>.</p>
+                    <p class="text-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Por favor, copia este token ahora. No podrás volver a verlo.
+                    </p>
+                    <div class="input-group">
+                        <input type="text" id="newTokenValueInput" class="form-control" value="@TempData["NewTokenValue"]" readonly />
+                        <button class="btn btn-outline-primary" type="button" id="copyTokenBtn" data-mdb-ripple-init>
+                            <i class="fas fa-clipboard me-2"></i> Copiar
+                        </button>
+                    </div>
+                    <div id="copyAlert" class="form-text text-success" style="display: none;">
+                        ¡Copiado al portapapeles!
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-mdb-dismiss="modal" data-mdb-ripple-init>Entendido</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var showNewTokenModalElement = document.getElementById('showNewTokenModal');
+            if (showNewTokenModalElement) {
+                var myModal = new mdb.Modal(showNewTokenModalElement);
+                myModal.show();
+            }
+
+            var copyBtn = document.getElementById('copyTokenBtn');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', function () {
+                    var tokenInput = document.getElementById('newTokenValueInput');
+                    navigator.clipboard.writeText(tokenInput.value).then(function () {
+                        var copyAlert = document.getElementById('copyAlert');
+                        copyAlert.style.display = 'block';
+                        setTimeout(function () {
+                            copyAlert.style.display = 'none';
+                        }, 2000);
+                    });
+                });
+            }
+        });
+    </script>
+}

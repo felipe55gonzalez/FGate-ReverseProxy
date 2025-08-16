@@ -1,0 +1,60 @@
+﻿@model IEnumerable<FGate.Data.Entities.WafRule>
+@{
+    ViewData["Title"] = "Reglas del Firewall (WAF)";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Crear Nueva Regla</a>
+</div>
+<p class="text-muted">
+    Estas reglas inspeccionan las peticiones en busca de patrones maliciosos. Pueden ser asignadas a Grupos de Endpoints.
+</p>
+
+<table class="table table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Nombre de la Regla</th>
+            <th>Acción</th>
+            <th>Estado</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <strong>@item.RuleName</strong>
+                    <p class="text-muted small mb-0">@item.Description</p>
+                </td>
+                <td>
+                    @if (item.Action == "Block")
+                    {
+                        <span class="badge bg-danger">Bloquear</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-info">Solo Registrar</span>
+                    }
+                </td>
+                <td>
+                    @if (item.IsEnabled)
+                    {
+                        <span class="badge bg-success">Habilitada</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Deshabilitada</span>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.RuleId" class="btn btn-sm btn-secondary">Editar</a>
+                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
+                            data-action-url="@Url.Action("Delete", new { id = item.RuleId })">
+                        Eliminar
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

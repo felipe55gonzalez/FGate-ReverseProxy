@@ -1,0 +1,60 @@
+@model IEnumerable<FGate.Data.Entities.BlockedIp>
+@{
+    ViewData["Title"] = "Gestión de IPs Bloqueadas";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1><i class="bi bi-slash-circle-fill"></i> @ViewData["Title"]</h1>
+    <a asp-action="Create" class="btn btn-danger"><i class="bi bi-plus-circle"></i> Bloquear Nueva IP</a>
+</div>
+
+<div class="mb-3">
+    <form asp-action="Index" method="get">
+        <div class="input-group">
+            <input type="text" name="searchString" class="form-control" placeholder="Buscar por IP o razón..." value="@ViewData["CurrentFilter"]">
+            <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i> Buscar</button>
+            <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-x"></i> Limpiar</a>
+        </div>
+    </form>
+</div>
+
+<table class="table table-striped table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Dirección IP</th>
+            <th>Razón</th>
+            <th>Bloqueado Hasta</th>
+            <th>Fecha de Bloqueo</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td><code>@Html.DisplayFor(modelItem => item.IpAddress)</code></td>
+                <td>@Html.DisplayFor(modelItem => item.Reason)</td>
+                <td>@(item.BlockedUntil.HasValue? item.BlockedUntil.Value.ToLocalTime().ToString("g") : "Permanente")</td>
+                <td>@item.CreatedAt.ToLocalTime().ToString("g")</td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-success"
+                            data-bs-toggle="modal"
+                            data-bs-target="#confirmDeleteModal"
+                            data-action-url="@Url.Action("Delete", "BlockedIps", new { id = item.BlockedIpId })"
+                            data-modal-title="Confirmar Desbloqueo"
+                            data-modal-body="¿Estás seguro de que quieres desbloquear esta dirección IP?"
+                            data-modal-button-class="btn-success"
+                            data-modal-button-text="Sí, Desbloquear">
+                        <i class="bi bi-check-circle"></i> Desbloquear
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+
+    </script>
+}

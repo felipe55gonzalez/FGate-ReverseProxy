@@ -1,0 +1,47 @@
+﻿@model IEnumerable<FGate.Data.Entities.AllowedCorsOrigin>
+@{
+    ViewData["Title"] = "Gestión de Orígenes CORS";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1><i class="bi bi-globe"></i> @ViewData["Title"]</h1>
+    <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Añadir Nuevo Origen</a>
+</div>
+<p class="text-muted">Estos son los dominios que tienen permiso para realizar solicitudes al proxy desde un navegador.</p>
+
+<table class="table table-striped table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>URL del Origen</th>
+            <th>Descripción</th>
+            <th>Habilitado</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td><code>@Html.DisplayFor(modelItem => item.OriginUrl)</code></td>
+                <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                <td>
+                    @if (item.IsEnabled)
+                    {
+                        <span class="badge bg-success">Sí</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">No</span>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.OriginId" class="btn btn-sm btn-secondary"><i class="bi bi-pencil-square"></i> Editar</a>
+                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
+                            data-action-url="@Url.Action("Delete", "AllowedCorsOrigins", new { id = item.OriginId })">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

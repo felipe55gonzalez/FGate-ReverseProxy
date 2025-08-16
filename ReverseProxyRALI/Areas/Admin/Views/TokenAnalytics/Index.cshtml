@@ -1,0 +1,64 @@
+﻿@model IEnumerable<FGate.Areas.Admin.Models.TokenUsageSummaryViewModel>
+@{
+    ViewData["Title"] = "Análisis de Uso de Tokens";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+</div>
+<p class="text-muted">
+    Un resumen de la actividad de todos los tokens de API generados.
+</p>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Descripción</th>
+                        <th>Propietario</th>
+                        <th>Estado</th>
+                        <th>Total Peticiones</th>
+                        <th>Último Uso (UTC)</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><strong>@item.Description</strong></td>
+                            <td>@item.OwnerName</td>
+                            <td>
+                                @if (item.IsEnabled)
+                                {
+                                    <span class="badge bg-success">Habilitado</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Deshabilitado</span>
+                                }
+                            </td>
+                            <td>@item.TotalRequests.ToString("N0")</td>
+                            <td>
+                                @if (item.LastUsedUtc.HasValue)
+                                {
+                                    @item.LastUsedUtc.Value.ToString("yyyy-MM-dd HH:mm:ss")
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Nunca</span>
+                                }
+                            </td>
+                            <td>
+                                <a asp-action="Details" asp-route-id="@item.TokenId" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-search"></i> Ver Detalles
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

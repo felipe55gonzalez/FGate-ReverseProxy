@@ -1,0 +1,14 @@
+﻿@model int
+
+<li class="nav-item">
+    <a class="nav-link position-relative" asp-area="Admin" asp-controller="Alerts" asp-action="Index" title="Alertas del Sistema">
+        <i class="bi bi-bell-fill fs-5"></i>
+        @if (Model > 0)
+        {
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem;">
+                @Model
+                <span class="visually-hidden">unread alerts</span>
+            </span>
+        }
+    </a>
+</li>

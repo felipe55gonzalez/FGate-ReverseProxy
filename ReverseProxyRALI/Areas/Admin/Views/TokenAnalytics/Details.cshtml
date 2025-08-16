@@ -1,0 +1,130 @@
+﻿@model FGate.Areas.Admin.Models.TokenUsageDetailViewModel
+@{
+    ViewData["Title"] = "Detalle de Token";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <p class="text-muted fs-5">@Model.Description</p>
+    </div>
+    <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Volver a la Lista</a>
+</div>
+
+<div class="row">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted text-uppercase small">Total de Peticiones</div>
+                <div class="fs-2 fw-bold">@Model.TotalRequests.ToString("N0")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted text-uppercase small">Primer Uso (UTC)</div>
+                <div class="fs-5 fw-bold">@(Model.FirstUsedUtc?.ToString("yyyy-MM-dd HH:mm") ?? "N/A")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted text-uppercase small">Último Uso (UTC)</div>
+                <div class="fs-5 fw-bold">@(Model.LastUsedUtc?.ToString("yyyy-MM-dd HH:mm") ?? "N/A")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted text-uppercase small">Estado</div>
+                <div class="fs-5 fw-bold">
+                    @if (Model.IsEnabled)
+                    {
+                        <span class="badge bg-success">Habilitado</span>
+                    }
+                    else
+                    {
+
+                        <span class="badge bg-secondary">Deshabilitado</span>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header fw-bold">Uso por Grupo de Endpoint</div>
+            <div class="card-body">
+                <div id="usageByEndpointChart" style="width: 100%; height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header fw-bold">Distribución de Códigos de Estado</div>
+            <div class="card-body">
+                <div id="statusCodesChart" style="width: 100%; height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header fw-bold">Últimas 15 Peticiones</div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-sm table-striped">
+                <thead>
+                    <tr>
+                        <th>Timestamp (UTC)</th>
+                        <th>Método</th>
+                        <th>Ruta</th>
+                        <th>Cód. Estado</th>
+                        <th>Duración (ms)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var log in Model.RecentRequests)
+                    {
+                        <tr>
+                            <td>@log.TimestampUtc.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                            <td><span class="badge bg-info text-dark">@log.HttpMethod</span></td>
+                            <td class="text-break">@log.RequestPath</td>
+                            <td>
+                                <span class="badge @(log.ResponseStatusCode >= 500 ? "bg-danger" : (log.ResponseStatusCode >= 400 ? "bg-warning text-dark" : "bg-success"))">
+                                    @log.ResponseStatusCode
+                                </span>
+                            </td>
+                            <td>@log.DurationMs</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Función genérica para renderizar ECharts
+            function renderEChart(elementId, jsonData) {
+                const chartDom = document.getElementById(elementId);
+                if (!chartDom) return;
+                const myChart = echarts.init(chartDom);
+                const option = JSON.parse(jsonData);
+                myChart.setOption(option);
+                window.addEventListener('resize', () => myChart.resize());
+            }
+
+            renderEChart('usageByEndpointChart', '@Html.Raw(Model.UsageByEndpointChartJson)');
+            renderEChart('statusCodesChart', '@Html.Raw(Model.StatusCodesChartJson)');
+        });
+    </script>
+}

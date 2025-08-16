@@ -1,0 +1,18 @@
+﻿@model FGate.Data.Entities.WafRule
+@{
+    ViewData["Title"] = "Crear Nueva Regla WAF";
+}
+
+ 
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Create">
+            @await Html.PartialAsync("_WafRuleForm")
+            <div class="form-group mt-4">
+                <input type="submit" value="Crear Regla" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>

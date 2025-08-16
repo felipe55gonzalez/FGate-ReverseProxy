@@ -1,0 +1,37 @@
+﻿@model SettingsViewModel
+@{
+    ViewData["Title"] = "Configuración General";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header fw-bold">
+                <i class="bi bi-sliders me-2"></i>Ajustes del Sistema
+            </div>
+            <div class="card-body">
+                <form asp-action="Index" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="LogRetentionDays" class="form-label"></label>
+                        <input asp-for="LogRetentionDays" type="number" class="form-control" style="max-width: 200px;" />
+                        <div class="form-text">
+                            Número de días que se conservarán los logs de peticiones y auditoría.
+                        </div>
+                        <span asp-validation-for="LogRetentionDays" class="text-danger"></span>
+                    </div>
+
+                    <hr />
+
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save-fill me-2"></i>Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

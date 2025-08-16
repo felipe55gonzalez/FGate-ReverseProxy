@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - FGate Proxy</title>
+
+    <link rel="stylesheet" href="~/lib/fontawesome/css/all.min.css" />
+    <link rel="stylesheet" href="~/lib/mdb/mdb.min.css" />
+
+    <style>
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            display: flex;
+        }
+
+        #sidenav-main {
+            flex: 0 0 240px;
+            height: 100vh;
+            overflow-y: auto;
+            padding-top: 80px;               
+        }
+
+        .page-content-wrapper {
+            flex: 1 1 auto;
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            padding-top: 80px;               
+            flex-grow: 1;
+        }
+
+        body.sidebar-hidden #sidenav-main {
+            display: none;
+        }
+
+        .navbar-brand img {
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <nav id="sidenav-main" class="sidenav">
+        <ul class="sidenav-menu pt-4">
+            <li class="sidenav-item">
+                <a class="sidenav-link" data-mdb-toggle="collapse" href="#configuracion-collapse" role="button"><i class="fas fa-cogs fa-fw me-3"></i><span>Configuración</span><i class="fas fa-angle-down rotate-icon ms-auto"></i></a>
+                <ul class="sidenav-collapse collapse" id="configuracion-collapse">
+                    <li class="sidenav-item"><a asp-area="Admin" asp-controller="EndpointGroups" asp-action="Index" class="sidenav-link">Grupos de Endpoints</a></li>
+                    <li class="sidenav-item"><a asp-area="Admin" asp-controller="BackendDestinations" asp-action="Index" class="sidenav-link">Destinos Backend</a></li>
+                    <li class="sidenav-item"><a asp-area="Admin" asp-controller="RouteTester" asp-action="Index" class="sidenav-link">Probador de Rutas</a></li>
+                    <li class="sidenav-item"><a asp-area="Admin" asp-controller="Settings" asp-action="Index" class="sidenav-link">Configuración General</a></li>
+                </ul>
+            </li>
+            <li class="sidenav-item">
+                <a class="sidenav-link" data-mdb-toggle="collapse" href="#seguridad-collapse" role="button"><i class="fas fa-shield-alt fa-fw me-3"></i><span>Seguridad</span><i class="fas fa-angle-down rotate-icon ms-auto"></i></a>
+                <ul class="sidenav-collapse collapse" id="seguridad-collapse">
+                    <li class="sidenav-item"><a asp-area="Admin" asp-controller="ApiTokens" asp-action="Index" class="sidenav-link">API Tokens</a></li>
+                    <li class="sidenav-item"><a asp-area="Admin" asp-controller="BlockedIps" asp-action="Index" class="sidenav-link">IPs Bloqueadas</a></li>
+                    <li class="sidenav-item"><a asp-area="Admin" asp-controller="AllowedCorsOrigins" asp-action="Index" class="sidenav-link">Orígenes CORS</a></li>
+                    <li class="sidenav-item"><a asp-area="Admin" asp-controller="RateLimitRules" asp-action="Index" class="sidenav-link">Reglas de Límite de Tasa</a></li>
+                    <li class="sidenav-item"><a asp-area="Admin" asp-controller="WafRules" asp-action="Index" class="sidenav-link">Reglas WAF</a></li>
+                </ul>
+            </li>
+            <li class="sidenav-item">
+                <a class="sidenav-link" data-mdb-toggle="collapse" href="#monitorizacion-collapse" role="button"><i class="fas fa-chart-line fa-fw me-3"></i><span>Monitorización</span><i class="fas fa-angle-down rotate-icon ms-auto"></i></a>
+                <ul class="sidenav-collapse collapse" id="monitorizacion-collapse">
+                    <li class="sidenav-item"><a asp-area="Admin" asp-controller="Analytics" asp-action="Index" class="sidenav-link">Estadísticas</a></li>
+                    <li class="sidenav-item"><a asp-area="Admin" asp-controller="RequestLogs" asp-action="Index" class="sidenav-link">Logs de Solicitudes</a></li>
+                    <li class="sidenav-item"><a asp-area="Admin" asp-controller="TokenAnalytics" asp-action="Index" class="sidenav-link">Análisis de Tokens</a></li>
+                    <li class="sidenav-item"><a asp-area="Admin" asp-controller="Alerts" asp-action="Index" class="sidenav-link">Alertas del Sistema</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="page-content-wrapper">
+        <header>
+            <nav id="main-navbar" class="navbar navbar-expand-lg navbar-light bg-body-tertiary fixed-top">
+                <div class="container-fluid">
+                    <button id="sidebar-toggler" class="navbar-toggler" type="button" aria-label="Toggle navigation">
+                        <i class="fas fa-bars"></i>
+                    </button>
+
+                    <a class="navbar-brand d-flex align-items-center" asp-area="Admin" asp-controller="Home" asp-action="Index" data-mdb-ripple-color="primary">
+                        <img src="~/logos/logo.png" alt="Logo FGate Proxy" style="height: 60px;" class="me-2" />
+                        <img src="~/logos/titulo.png" alt="Título Proxy" style="height: 22px;" />
+                    </a>
+
+                    <span class="h4 mb-0 page-title ms-3 d-none d-md-block">@ViewData["Title"]</span>
+
+                    <ul class="navbar-nav ms-auto d-flex flex-row align-items-center">
+                        <li class="nav-item me-3"><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="theme-switcher" /><label class="form-check-label" for="theme-switcher"><i class="fas fa-sun"></i> <i class="fas fa-moon"></i></label></div></li>
+                        <li class="nav-item me-3">@await Component.InvokeAsync("UnreadAlerts")</li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdownMenuLink" role="button" data-mdb-dropdown-init aria-expanded="false">
+                                <i class="fas fa-user-circle fa-2x me-2"></i>
+                                Bienvenido, <strong>@User.Identity.Name</strong>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
+                                <li>
+                                    <form asp-area="Admin" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm">
+                                        @Html.AntiForgeryToken()
+                                        <a class="dropdown-item" href="#" onclick="document.getElementById('logoutForm').submit();"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+
+        <main class="container-fluid my-4">
+            @RenderBody()
+        </main>
+    </div>
+
+    <div class="toast-container"></div>
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Acción</h5><button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button></div><form id="deleteForm" method="post">@Html.AntiForgeryToken()<div class="modal-body">¿Estás seguro?</div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Cancelar</button><button type="submit" class="btn btn-danger">Confirmar</button></div></form></div></div></div>
+
+    <script type="text/javascript" src="~/lib/mdb/mdb.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+                  
+            const toggler = document.getElementById('sidebar-toggler');
+            if (toggler) {
+                toggler.addEventListener('click', function() {
+                    document.body.classList.toggle('sidebar-hidden');
+                });
+            }
+            document.querySelectorAll('[data-mdb-dropdown-init]').forEach((dropdown) => {
+                new mdb.Dropdown(dropdown);
+            });
+            document.querySelectorAll('.sidenav-link[data-mdb-toggle="collapse"]').forEach((link) => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const target = document.querySelector(link.getAttribute('href'));
+                    if(target) {
+                        const instance = mdb.Collapse.getInstance(target) || new mdb.Collapse(target);
+                        instance.toggle();
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const themeSwitcher = document.getElementById('theme-switcher');
+            const htmlElement = document.documentElement;
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            if (savedTheme === 'dark') { htmlElement.setAttribute('data-mdb-theme', 'dark'); themeSwitcher.checked = true; }
+            themeSwitcher.addEventListener('change', function () { if (this.checked) { htmlElement.setAttribute('data-mdb-theme', 'dark'); localStorage.setItem('theme', 'dark'); } else { htmlElement.setAttribute('data-mdb-theme', 'light'); localStorage.setItem('theme', 'light'); } });
+
+            var confirmDeleteModal = document.getElementById('confirmDeleteModal');
+            if (confirmDeleteModal) { confirmDeleteModal.addEventListener('show.mdb.modal', function (event) { var button = event.relatedTarget; var actionUrl = button.getAttribute('data-action-url'); var modalTitle = button.getAttribute('data-modal-title'); var modalBody = button.getAttribute('data-modal-body'); var buttonClass = button.getAttribute('data-modal-button-class'); var buttonText = button.getAttribute('data-modal-button-text'); var form = document.getElementById('deleteForm'); var titleElement = confirmDeleteModal.querySelector('.modal-title'); var bodyElement = confirmDeleteModal.querySelector('.modal-body'); var submitButton = form.querySelector('button[type="submit"]'); form.action = actionUrl; titleElement.textContent = modalTitle || 'Confirmar Eliminación'; bodyElement.textContent = modalBody || '¿Estás seguro de que quieres eliminar este elemento?'; submitButton.className = buttonClass || 'btn btn-danger'; submitButton.innerHTML = `<i class="fas fa-trash me-2"></i> ${buttonText || 'Sí, Eliminar'}`; }); }
+
+            var toastMessage = '@(TempData["ToastMessage"] as string)';
+            if (toastMessage) { var toastContainer = document.querySelector('.toast-container'); var toastHTML = `<div class="toast fade show bg-success text-white" role="alert" aria-live="assertive" aria-atomic="true" data-mdb-autohide="true" data-mdb-delay="5000"><div class="toast-header bg-success text-white"><i class="fas fa-check-circle me-2"></i><strong class="me-auto">Éxito</strong><button type="button" class="btn-close btn-close-white" data-mdb-dismiss="toast" aria-label="Close"></button></div><div class="toast-body">${toastMessage}</div></div>`; toastContainer.innerHTML = toastHTML; const toast = new mdb.Toast(toastContainer.querySelector('.toast')); toast.show(); }
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,104 @@
+@model IEnumerable<FGate.Data.Entities.BackendDestination>
+@{
+    ViewData["Title"] = "Destinos Backend";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+     
+    <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Añadir Nuevo Destino</a>
+</div>
+
+<div class="mb-3">
+    <form asp-action="Index" method="get">
+        <div class="input-group">
+            <input type="text" name="searchString" class="form-control" placeholder="Buscar por nombre o dirección..." value="@ViewData["CurrentFilter"]">
+            <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i> Buscar</button>
+            <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-x"></i> Limpiar</a>
+        </div>
+    </form>
+</div>
+
+<table class="table table-striped table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Nombre Amigable</th>
+            <th>Dirección (URL del servicio)</th>
+            <th>Estado</th>
+            <th>Habilitado</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.FriendlyName)</td>
+                <td><code>@Html.DisplayFor(modelItem => item.Address)</code></td>
+                <td data-address="@item.Address">
+                    <span class="badge bg-light text-dark">Cargando...</span>
+                </td>
+                <td>
+                    @if (item.IsEnabled)
+                    {
+                        <span class="badge bg-success">Sí</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">No</span>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.DestinationId" class="btn btn-sm btn-secondary"><i class="bi bi-pencil-square"></i> Editar</a>
+                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
+                            data-action-url="@Url.Action("Delete", "BackendDestinations", new { id = item.DestinationId })">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            function fetchHealthStatus() {
+                fetch('/api/HealthStatus/GetDestinationsStatus')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('La respuesta de la red no fue correcta.');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        data.forEach(destStatus => {
+                            // Buscamos la celda usando el atributo 'data-address'
+                            const cell = document.querySelector(`td[data-address="${destStatus.address}"]`);
+
+                            if (cell) {
+                                let badgeClass = 'bg-secondary';
+                                let statusText = 'Desconocido';
+
+                                switch (destStatus.status) {
+                                    case 'Healthy':
+                                        badgeClass = 'bg-success';
+                                        statusText = 'Saludable';
+                                        break;
+                                    case 'Unhealthy':
+                                        badgeClass = 'bg-danger';
+                                        statusText = 'No Saludable';
+                                        break;
+                                }
+                                cell.innerHTML = `<span class="badge ${badgeClass}">${statusText}</span>`;
+                            }
+                        });
+                    })
+                    .catch(error => console.error('Error al obtener el estado de salud:', error));
+            }
+
+            fetchHealthStatus();
+            setInterval(fetchHealthStatus, 15000);
+        });
+    </script>
+}

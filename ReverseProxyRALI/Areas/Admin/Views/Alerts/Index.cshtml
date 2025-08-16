@@ -1,0 +1,50 @@
+﻿@model IEnumerable<FGate.Data.Entities.SystemAlert>
+@{
+    ViewData["Title"] = "Alertas del Sistema";
+
+    string GetAlertClass(string level)
+    {
+        return level switch
+        {
+            "Critical" => "list-group-item-danger",
+            "Warning" => "list-group-item-warning",
+            _ => "list-group-item-info"
+        };
+    }
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <form asp-action="MarkAllAsRead" method="post">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-check-all"></i> Marcar todas como leídas
+        </button>
+    </form>
+</div>
+<p class="text-muted">
+    Historial de los últimos 100 eventos importantes de seguridad y estado del sistema.
+</p>
+
+<div class="list-group">
+    @foreach (var alert in Model)
+    {
+        <div class="list-group-item list-group-item-action @GetAlertClass(alert.Level) @(alert.IsRead ? "opacity-50" : "")">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">@alert.Title</h5>
+                <small>@alert.TimestampUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</small>
+            </div>
+            <p class="mb-1 small">
+                <code>@alert.Details</code>
+            </p>
+            <div class="d-flex justify-content-end">
+                @if (!alert.IsRead)
+                {
+                    <form asp-action="MarkAsRead" asp-route-id="@alert.AlertId" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-sm btn-outline-dark">Marcar como leída</button>
+                    </form>
+                }
+            </div>
+        </div>
+    }
+</div>

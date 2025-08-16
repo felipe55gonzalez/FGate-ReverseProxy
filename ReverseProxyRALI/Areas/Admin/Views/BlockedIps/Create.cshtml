@@ -1,0 +1,35 @@
+@model FGate.Areas.Admin.Models.BlockedIpViewModel
+@{
+    ViewData["Title"] = "Bloquear Nueva Dirección IP";
+}
+
+ 
+
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="IpAddress" class="form-label"></label>
+                <input asp-for="IpAddress" class="form-control" />
+                <span asp-validation-for="IpAddress" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Reason" class="form-label"></label>
+                <textarea asp-for="Reason" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Reason" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="BlockedUntil" class="form-label"></label>
+                <input asp-for="BlockedUntil" class="form-control" type="datetime-local" />
+                <span asp-validation-for="BlockedUntil" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-4">
+                <input type="submit" value="Bloquear IP" class="btn btn-danger" />
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>

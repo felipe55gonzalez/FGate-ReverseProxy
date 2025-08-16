@@ -1,0 +1,30 @@
+﻿@model FGate.Data.Entities.RateLimitRule
+@{
+    ViewData["Title"] = "Crear Regla de Límite de Tasa";
+}
+
+ 
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="RuleName" class="form-label">Nombre de la Regla</label>
+                <input asp-for="RuleName" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="RequestLimit" class="form-label">Límite de Peticiones</label>
+                <input asp-for="RequestLimit" type="number" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="PeriodSeconds" class="form-label">Periodo (en segundos)</label>
+                <input asp-for="PeriodSeconds" type="number" class="form-control" />
+            </div>
+            <div class="form-group mt-4">
+                <input type="submit" value="Crear" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>

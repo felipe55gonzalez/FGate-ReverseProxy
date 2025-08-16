@@ -1,0 +1,24 @@
+@model FGate.Data.Entities.BackendDestination
+@{
+    ViewData["Title"] = "Eliminar Destino";
+}
+
+ 
+
+<h3 class="text-danger">¿Estás seguro de que quieres eliminar este destino?</h3>
+<p class="text-warning">Eliminar un destino puede afectar a los grupos de endpoints que lo estén utilizando.</p>
+<div>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">Nombre</dt>
+        <dd class = "col-sm-10">@Html.DisplayFor(model => model.FriendlyName)</dd>
+        <dt class = "col-sm-2">Dirección</dt>
+        <dd class = "col-sm-10"><code>@Html.DisplayFor(model => model.Address)</code></dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="DestinationId" />
+        <input type="submit" value="Eliminar" class="btn btn-danger" /> |
+        <a asp-action="Index">Volver a la Lista</a>
+    </form>
+</div>

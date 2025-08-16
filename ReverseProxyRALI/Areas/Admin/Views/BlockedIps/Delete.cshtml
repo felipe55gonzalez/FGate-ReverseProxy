@@ -1,0 +1,27 @@
+@model FGate.Data.Entities.BlockedIp
+@{
+    ViewData["Title"] = "Desbloquear IP";
+}
+
+ 
+
+<h3 class="text-success">¿Estás seguro de que quieres desbloquear esta dirección IP?</h3>
+<div>
+    <h4>IP Bloqueada</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">Dirección IP</dt>
+        <dd class="col-sm-10"><code>@Html.DisplayFor(model => model.IpAddress)</code></dd>
+        <dt class="col-sm-2">Razón</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Reason)</dd>
+        <dt class="col-sm-2">Fecha de Bloqueo</dt>
+        <dd class="col-sm-10">@Model.CreatedAt.ToLocalTime().ToString("g")</dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="BlockedIpId" />
+        <input type="submit" value="Sí, Desbloquear" class="btn btn-success" /> |
+        <a asp-action="Index">Cancelar</a>
+    </form>
+</div>

@@ -1,0 +1,105 @@
+@model FGate.Areas.Admin.Models.AnalyticsViewModel
+@{
+    ViewData["Title"] = "Estadísticas de Tráfico";
+}
+
+<div class="alert alert-secondary" role="alert">
+    <i class="bi bi-info-circle"></i> Mostrando datos agregados de las últimas 24 horas.
+</div>
+
+<div class="row">
+    <div class="col-xl-8 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header fw-bold"><i class="bi bi-graph-up me-2"></i>Volumen de Solicitudes por Hora</div>
+            <div class="card-body">
+                <div id="hourlyTrafficChart" style="width: 100%; height: 350px;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header fw-bold"><i class="bi bi-pie-chart-fill me-2"></i>Distribución de Métodos HTTP</div>
+            <div class="card-body">
+                <div id="httpMethodsChart" style="width: 100%; height: 350px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i>Tasa de Errores (4xx vs 5xx)</div>
+            <div class="card-body">
+                <div id="errorsChart" style="width: 100%; height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header fw-bold"><i class="bi bi-stopwatch-fill me-2"></i>Latencia Promedio por Hora</div>
+            <div class="card-body">
+                <div id="latencyChart" style="width: 100%; height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header fw-bold"><i class="bi bi-sort-down me-2"></i>Top 5 Endpoints Más Lentos (Latencia Promedio)</div>
+            <div class="card-body">
+                <div id="slowestEndpointsChart" style="width: 100%; height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header fw-bold"><i class="bi bi-diagram-3-fill me-2"></i>Tráfico por Grupo de Endpoints</div>
+            <div class="card-body">
+                <div id="trafficByGroupChart" style="width: 100%; height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            function renderEChart(elementId, jsonData) {
+                const chartDom = document.getElementById(elementId);
+                if (!chartDom) {
+                    console.error(`Element with id '${elementId}' not found.`);
+                    return;
+                }
+                const myChart = echarts.init(chartDom);
+                const option = JSON.parse(jsonData);
+
+                const defaultOptions = {
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    color: ['#5470C6', '#91CC75', '#EE6666', '#FAC858', '#73C0DE']
+                };
+
+                myChart.setOption({ ...defaultOptions, ...option });
+
+                window.addEventListener('resize', function() {
+                    myChart.resize();
+                });
+            }
+
+            renderEChart('hourlyTrafficChart', '@Html.Raw(Model.HourlyTrafficChartJson)');
+            renderEChart('httpMethodsChart', '@Html.Raw(Model.HttpMethodsChartJson)');
+            renderEChart('errorsChart', '@Html.Raw(Model.ErrorsChartJson)');
+            renderEChart('latencyChart', '@Html.Raw(Model.LatencyChartJson)');
+            renderEChart('slowestEndpointsChart', '@Html.Raw(Model.SlowestEndpointsChartJson)');
+            renderEChart('trafficByGroupChart', '@Html.Raw(Model.TrafficByGroupChartJson)');
+        });
+    </script>
+}
